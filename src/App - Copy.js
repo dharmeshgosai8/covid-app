@@ -1,6 +1,6 @@
 import React , {useState, useEffect} from 'react';
 import StateData from './StateData'
-// import TotalCount from './TotalCount'
+import TotalCount from './TotalCount'
 import './App.css';
 
 function App() {
@@ -10,25 +10,24 @@ function App() {
   const [setData, setDatas] = useState([]);
   const [st, sts] = useState(); // to show state name
   const [clicked, clickEvent] = useState(false);
-  
-  function getData(data,ds){    
-    // console.log(data);
+  // const active = [];
+  function getData(data,ds){
     setDatas(data);
     clickEvent(true); 
     sts(ds);
   }  
 
   useEffect(() =>{
-    fetch('https://data.covid19india.org/state_district_wise.json')
+    fetch('https://data.covid19india.org/v4/min/data.min.json')
     .then(res => res.json())
     .then(
       (result)=>{        
         setIsLoaded(true);
         setItems(result);
-        console.log(result);
+        
       },(error)=>{
         console.log(error);
-        // console.log('error');
+        console.log('error');
         setError(error);
       }
     )
@@ -41,26 +40,29 @@ function App() {
         <h2>Loading...</h2>
       </div>
     );
-  } else {  
-        
+  } else {    
   return (
     <div className="App">
       <h2>India Covid-19 Tracker Statewise Data</h2>
-      <ul className="statelist clearfix">
-        {
-        clicked ? (
-          <StateData setData={setData}  clickEvent={clickEvent}  st={st}/>
-        ):(null)
-        }
+      <ul className="statelist clearfix">    
+      
+        {clicked ? (
+          <StateData setData={setData} clickEvent={clickEvent} st={st} />
+        ):(null)}
 
-          {Object.entries(items).map((item) => (            
-            <li key={item[1].statecode}>
-              {console.log(item)}
-              <div className="text" title={item.state} onClick={() => getData(item[1].districtData,item[0])}>
-                {item[0]}
+          {
+            items.map(item =>            
+                              
+          <li key={item.statecode}>
+              
+              <div className="text" title={item.state} onClick={() => getData(item.districtData, item.state)}>
+                {item.state} 
+                <span><TotalCount count={item.districtData} /></span>
               </div>
             </li>
-          ))}        
+            
+         )          
+        }
       </ul>
     </div>
   );
